@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Nixie Reveal — guided self-discovery journey in six phases."
+    />
+    <title>Nixie Reveal</title>
+    <link rel="stylesheet" href="./assets/css/reset.css" />
+    <link rel="stylesheet" href="./assets/css/tokens.css" />
+    <link rel="stylesheet" href="./assets/css/layout.css" />
+    <link rel="stylesheet" href="./assets/css/components.css" />
+    <link rel="stylesheet" href="./assets/css/navigation.css" />
+    <link rel="stylesheet" href="./assets/css/animations.css" />
+  </head>
+  <body class="landing-page">
+    <main class="landing-shell">
+      <section class="landing-card">
+        <p class="eyebrow">Phase-driven self-discovery</p>
+        <h1>Nixie Reveal</h1>
+        <p class="landing-copy">
+          A quiet, warm, six-part journey for identity, values, fears, dreams,
+          relationships, and purpose.
+        </p>
+        <div class="landing-actions">
+          <a class="button button-primary" href="./phases/phase1.html">Begin Journey</a>
+          <a class="button button-secondary" href="./phases/phase6.html">View Summary</a>
+        </div>
+        <p class="landing-note">
+          Redirecting to phase 1 shortly.
+        </p>
+      </section>
+    </main>
+    <script>
+      const target = "./phases/phase1.html";
+      const timer = window.setTimeout(() => {
+        window.location.href = target;
+      }, 7000);
+      document.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => window.clearTimeout(timer), { once: true });
+      });
+      window.addEventListener("mousemove", () => window.clearTimeout(timer), { once: true });
+      window.addEventListener("keydown", () => window.clearTimeout(timer), { once: true });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,221 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+    background var(--transition-fast), border-color var(--transition-fast);
+  user-select: none;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:focus-visible {
+  outline: 3px solid rgba(255, 176, 181, 0.35);
+  outline-offset: 2px;
+}
+
+.button-primary {
+  color: #3a2f33;
+  background: linear-gradient(135deg, #ffd3d6, #f9dcc0);
+  box-shadow: var(--shadow-soft);
+}
+
+.button-secondary {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.52);
+  border-color: var(--border-soft);
+}
+
+.phase-shell {
+  align-items: start;
+}
+
+.phase-panel {
+  display: grid;
+  gap: 24px;
+  padding: clamp(22px, 3vw, 32px);
+  border-radius: var(--radius-lg);
+  background: var(--surface-strong);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+.progress-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.progress-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(58, 47, 51, 0.08);
+}
+
+.progress-bar > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffb0b5, #f9dcc0);
+  transition: width var(--transition-standard);
+}
+
+.question-list {
+  display: grid;
+  gap: 18px;
+}
+
+.question-card,
+.summary-card {
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 6px 18px rgba(58, 47, 51, 0.06);
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.field-label small {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.field-help {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  font-size: 0.94rem;
+}
+
+.field-control {
+  width: 100%;
+  padding: 14px 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(58, 47, 51, 0.14);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text-main);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.field-control:focus {
+  outline: none;
+  border-color: rgba(255, 176, 181, 0.9);
+  box-shadow: 0 0 0 4px rgba(255, 176, 181, 0.18);
+}
+
+textarea.field-control {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.choice-group {
+  display: grid;
+  gap: 10px;
+}
+
+.choice-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(58, 47, 51, 0.1);
+}
+
+.choice-item input {
+  margin-top: 4px;
+}
+
+.field-status {
+  min-height: 20px;
+  margin-top: 10px;
+  color: #6f7c67;
+  font-size: 0.85rem;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.field-status.is-visible {
+  opacity: 1;
+}
+
+.phase-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 6px;
+}
+
+.summary-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.summary-card h2,
+.summary-empty h2 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.summary-item {
+  padding: 14px 0;
+  border-top: 1px solid rgba(58, 47, 51, 0.08);
+}
+
+.summary-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.summary-item h3 {
+  margin: 0 0 6px;
+  font-size: 0.98rem;
+}
+
+.summary-item p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.summary-count {
+  color: var(--text-muted);
+}
