@@ -1,25 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
   <title id="title">Nixie Discovery</title>
-  <desc id="desc">Róża wiatrów w miękkich różowo-kremowych barwach z monogramem N w centrum.</desc>
+  <desc id="desc">Róża wiatrów w miękkich pastelowych różowo-morelowych barwach z monogramem N w centrum.</desc>
   <defs>
     <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0%" stop-color="#FFF3F4" />
-      <stop offset="55%" stop-color="#FFE2E5" />
-      <stop offset="100%" stop-color="#F9DCC0" />
+      <stop offset="0%" stop-color="#FEC3E1" />
+      <stop offset="55%" stop-color="#FFCEDA" />
+      <stop offset="100%" stop-color="#F9F1EB" />
     </linearGradient>
     <linearGradient id="petal" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0%" stop-color="#FFD3D6" />
-      <stop offset="100%" stop-color="#FFB0B5" />
+      <stop offset="0%" stop-color="#FEC3E1" />
+      <stop offset="100%" stop-color="#FFDAD5" />
     </linearGradient>
     <linearGradient id="petal2" x1="1" x2="0" y1="0" y2="1">
-      <stop offset="0%" stop-color="#F9DCC0" />
-      <stop offset="100%" stop-color="#FFD9D2" />
+      <stop offset="0%" stop-color="#FEF1C8" />
+      <stop offset="100%" stop-color="#FFE7CF" />
     </linearGradient>
   </defs>
 
   <rect x="16" y="16" width="224" height="224" rx="56" fill="url(#bg)" />
   <circle cx="128" cy="128" r="82" fill="white" fill-opacity="0.28" />
-    <circle cx="128" cy="128" r="66" fill="white" fill-opacity="0.32" stroke="#3A2F33" stroke-opacity="0.08" stroke-width="2" />
+    <circle cx="128" cy="128" r="66" fill="white" fill-opacity="0.32" stroke="#4F3940" stroke-opacity="0.08" stroke-width="2" />
 
   <g transform="translate(128 128)">
     <path d="M0 -96 L16 -28 L0 -38 L-16 -28 Z" fill="url(#petal)" />
@@ -32,13 +32,13 @@
     <path d="M0 72 L-20 20 L0 30 L20 20 Z" fill="#FFFFFF" fill-opacity="0.82" />
     <path d="M-72 0 L-20 -20 L-30 0 L-20 20 Z" fill="#FFFFFF" fill-opacity="0.82" />
 
-    <path d="M0 -120 L10 -56 L0 -72 L-10 -56 Z" fill="#3A2F33" />
-    <path d="M120 0 L56 10 L72 0 L56 -10 Z" fill="#3A2F33" />
-    <path d="M0 120 L-10 56 L0 72 L10 56 Z" fill="#3A2F33" />
-    <path d="M-120 0 L-56 -10 L-72 0 L-56 10 Z" fill="#3A2F33" />
+    <path d="M0 -120 L10 -56 L0 -72 L-10 -56 Z" fill="#4F3940" />
+    <path d="M120 0 L56 10 L72 0 L56 -10 Z" fill="#4F3940" />
+    <path d="M0 120 L-10 56 L0 72 L10 56 Z" fill="#4F3940" />
+    <path d="M-120 0 L-56 -10 L-72 0 L-56 10 Z" fill="#4F3940" />
 
-    <circle cx="0" cy="0" r="34" fill="#3A2F33" />
+    <circle cx="0" cy="0" r="34" fill="#4F3940" />
     <circle cx="0" cy="0" r="24" fill="url(#bg)" />
-    <path d="M-12 -16h8l10 16V-16h8v32h-8l-10-16v16h-8z" fill="#3A2F33" />
+    <path d="M-12 -16h8l10 16V-16h8v32h-8l-10-16v16h-8z" fill="#4F3940" />
   </g>
 </svg>

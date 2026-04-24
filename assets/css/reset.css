@@ -59,7 +59,7 @@ a {
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #ffb0b5, #f9dcc0);
+  background: linear-gradient(180deg, var(--color-rose), var(--color-secondary));
 }
 
 *::-webkit-scrollbar-corner {
