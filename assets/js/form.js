@@ -18,12 +18,12 @@ const collectFieldValue = (root, questionId) => {
   const type = fields[0].type;
   const fieldType = fields[0].closest("[data-field-type]")?.dataset?.fieldType;
 
-  if (fieldType === "radio") {
+  if (fieldType === "radio" || fieldType === "single") {
     const checked = fields.find((field) => field.checked);
     return checked ? checked.value : "";
   }
 
-  if (fieldType === "checkbox") {
+  if (fieldType === "checkbox" || fieldType === "multi") {
     if (fields.length === 1 && fields[0].value === "true") {
       return fields[0].checked;
     }
@@ -39,23 +39,32 @@ const collectFieldValue = (root, questionId) => {
 
 const applyValueToField = (field, value) => {
   const fieldType = field.closest("[data-field-type]")?.dataset?.fieldType;
-  if (fieldType === "radio") {
+  if (fieldType === "radio" || fieldType === "single") {
     field.checked = String(field.value) === String(value);
     return;
   }
 
-  if (fieldType === "checkbox") {
+  if (fieldType === "checkbox" || fieldType === "multi") {
     if (Array.isArray(value)) {
       field.checked = value.includes(field.value);
-      return;
+    } else {
+      field.checked = Boolean(value) && field.value === "true";
     }
-    field.checked = Boolean(value) && field.value === "true";
     return;
   }
 
   if (field.tagName === "SELECT" || field.tagName === "TEXTAREA" || field.tagName === "INPUT") {
     field.value = value ?? "";
   }
+};
+
+const syncChoiceState = (field) => {
+  const card = field.closest("[data-question-id]");
+  if (!card) return;
+  card.querySelectorAll(".choice-item").forEach((item) => {
+    const input = item.querySelector("input");
+    item.dataset.selected = input?.checked ? "true" : "false";
+  });
 };
 
 const setSavedStatus = (root, questionId, visible = true) => {
@@ -84,6 +93,7 @@ const persistQuestion = (root, questionId) => {
     setAnswer(questionId, value);
   }
   setSavedStatus(root, questionId, true);
+  window.dispatchEvent(new Event("nixie:answers-updated"));
 };
 
 const schedulePersist = (root, questionId) => {
@@ -97,6 +107,23 @@ const schedulePersist = (root, questionId) => {
 
 const hydrateField = (field, value) => {
   applyValueToField(field, value);
+  if (field.tagName === "SELECT") {
+    const shell = field.closest(".select-shell");
+    if (shell) {
+      const trigger = shell.querySelector(".select-trigger");
+      const label = shell.querySelector(".select-trigger-label");
+      const selected = shell.querySelector(`.select-option[data-value="${escapeSelector(field.value)}"]`);
+      shell.querySelectorAll(".select-option").forEach((option) => {
+        option.dataset.selected = option.dataset.value === field.value ? "true" : "false";
+      });
+      if (label) label.textContent = selected?.textContent || "Wybierz opcję";
+      if (trigger) trigger.dataset.hasValue = field.value ? "true" : "false";
+    }
+  }
+  const fieldType = field.closest("[data-field-type]")?.dataset?.fieldType;
+  if (fieldType === "radio" || fieldType === "single" || fieldType === "checkbox" || fieldType === "multi") {
+    syncChoiceState(field);
+  }
 };
 
 const hydrateRoot = (root) => {
@@ -111,6 +138,7 @@ const hydrateRoot = (root) => {
     fields.forEach((field) => hydrateField(field, value));
     if (value !== undefined) setSavedStatus(root, questionId, true);
   });
+  window.dispatchEvent(new Event("nixie:answers-updated"));
 };
 
 const attachListeners = (root) => {

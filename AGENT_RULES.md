@@ -1,4 +1,4 @@
-# Agent Rules — Nixie Reveal
+# Agent Rules — Nixie Discovery
 
 ## Golden Rule
 NEVER edit HTML to change questions. Only edit `config/phases.js`.

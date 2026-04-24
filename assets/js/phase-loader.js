@@ -2,7 +2,8 @@ import { phases } from "../../config/phases.js";
 import { renderPhase } from "./ui.js";
 import { initForm } from "./form.js";
 import { initNav } from "./navigation.js";
-import { renderSummary } from "./summary.js";
+import { isPhaseComplete, isPhaseUnlocked, markPhaseVisited } from "./state.js";
+import { phaseOrder } from "../../config/phases.js";
 
 const derivePhaseId = () => {
   const segments = window.location.pathname.split("/").filter(Boolean);
@@ -16,14 +17,38 @@ const phaseData = phases[phaseId];
 if (!phaseData) {
   console.error("Unknown phase:", phaseId);
 } else {
-  document.title = phaseId === "phase6" ? "Summary | Nixie Reveal" : `${phaseData.title} | Nixie Reveal`;
+  document.title = `${phaseData.title} | Nixie Discovery`;
 }
 
-if (phaseId === "phase6") {
-  renderSummary("phase-root");
-} else if (phaseData) {
+const canRenderPhase = !phaseData || isPhaseUnlocked(phaseId);
+
+if (phaseData && !canRenderPhase) {
+  const fallbackId = phaseOrder.find((id) => !isPhaseComplete(id)) || phaseOrder[0];
+  window.location.replace(new URL(`../../phases/${fallbackId}.html`, import.meta.url).href);
+}
+
+if (phaseData && canRenderPhase) {
   renderPhase(phaseData, "phase-root", phaseId);
+  markPhaseVisited(phaseId);
   initForm();
 }
 
-initNav(phaseId);
+if (canRenderPhase) initNav(phaseId);
+
+if (phaseData?.generated === "experiment" && canRenderPhase) {
+  const getSelectedPath = () => {
+    try {
+      return JSON.parse(window.localStorage.getItem("nixie_answers") || "{}").selected_path || "";
+    } catch {
+      return "";
+    }
+  };
+  let lastSelectedPath = getSelectedPath();
+  window.addEventListener("nixie:answers-updated", () => {
+    const selected = getSelectedPath();
+    if (selected === lastSelectedPath) return;
+    lastSelectedPath = selected;
+    renderPhase(phaseData, "phase-root", phaseId);
+    initForm();
+  });
+}

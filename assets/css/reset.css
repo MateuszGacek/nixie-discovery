@@ -32,3 +32,36 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent) #ffffff;
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #ffffff;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ffb0b5, #f9dcc0);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}

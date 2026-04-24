@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="pl">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Nixie Reveal — guided self-discovery journey in six phases."
+      content="Nixie Discovery — spokojna podróż przez to, co daje energię, sens i poczucie bycia sobą."
     />
-    <title>Nixie Reveal</title>
+    <title>Nixie Discovery</title>
     <link rel="stylesheet" href="./assets/css/reset.css" />
     <link rel="stylesheet" href="./assets/css/tokens.css" />
     <link rel="stylesheet" href="./assets/css/layout.css" />
@@ -18,31 +18,48 @@
   <body class="landing-page">
     <main class="landing-shell">
       <section class="landing-card">
-        <p class="eyebrow">Phase-driven self-discovery</p>
-        <h1>Nixie Reveal</h1>
-        <p class="landing-copy">
-          A quiet, warm, six-part journey for identity, values, fears, dreams,
-          relationships, and purpose.
-        </p>
-        <div class="landing-actions">
-          <a class="button button-primary" href="./phases/phase1.html">Begin Journey</a>
-          <a class="button button-secondary" href="./phases/phase6.html">View Summary</a>
+        <div class="landing-hero">
+          <div class="brand-mark">
+            <img src="./assets/logo.svg" alt="" aria-hidden="true" />
+            <div>
+              <p class="eyebrow">Twoja spokojna podróż</p>
+              <h1>Miło Cię widzieć</h1>
+            </div>
+          </div>
+          <p class="landing-copy">
+            To miejsce jest po to, żebyś mogła usłyszeć siebie bez presji,
+            bez oceniania i bez szukania jednej idealnej odpowiedzi. Krok po kroku
+            przejdziesz przez pytania o energię, radość, talenty, emocje i kierunki,
+            które mogą naprawdę pasować do Ciebie.
+          </p>
+          <p class="landing-note">
+            Zatrzymaj się. Oddychaj. Pisz tak, jak naprawdę czujesz.
+          </p>
         </div>
-        <p class="landing-note">
-          Redirecting to phase 1 shortly.
-        </p>
+        <div class="landing-actions">
+          <a class="button button-primary button-hero button-hero-primary" href="./phases/onboarding.html">Wejdź w podróż</a>
+          <a class="button button-secondary button-hero" href="./summary.html">Wróć do swoich odkryć</a>
+          <button class="button button-danger button-hero" type="button" id="clear-app">Zacznij od nowa</button>
+        </div>
+        <div class="landing-course">
+          <strong>Co Cię czeka?</strong>
+          <p>
+            12 krótkich etapów o tym, kim jesteś, co daje Ci energię, jakie masz talenty,
+            czego potrzebujesz w pracy i które kierunki warto sprawdzić w praktyce.
+            Na końcu dostaniesz uporządkowane podsumowanie swoich odpowiedzi.
+          </p>
+        </div>
       </section>
     </main>
     <script>
-      const target = "./phases/phase1.html";
-      const timer = window.setTimeout(() => {
-        window.location.href = target;
-      }, 7000);
-      document.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => window.clearTimeout(timer), { once: true });
+      const KEY = "nixie_answers";
+      const clearAppButton = document.getElementById("clear-app");
+      clearAppButton?.addEventListener("click", () => {
+        const confirmed = window.confirm("Czy na pewno chcesz usunąć swoje odpowiedzi i zacząć od nowa?");
+        if (!confirmed) return;
+        localStorage.removeItem(KEY);
+        window.location.reload();
       });
-      window.addEventListener("mousemove", () => window.clearTimeout(timer), { once: true });
-      window.addEventListener("keydown", () => window.clearTimeout(timer), { once: true });
     </script>
   </body>
 </html>
