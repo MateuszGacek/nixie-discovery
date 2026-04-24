@@ -1,4 +1,4 @@
-import { getData, setData, clearData } from "./storage.js";
+import { getData, setData, clearData, clearResumePhase, getResumePhase, setResumePhase } from "./storage.js";
 import { phases, phaseOrder } from "../../config/phases.js";
 
 const phaseIndex = new Map(phaseOrder.map((phaseId, index) => [phaseId, index]));
@@ -39,7 +39,13 @@ export const removeAnswer = (questionId) => {
   return current;
 };
 
-export const resetState = () => clearData();
+export const resetState = () => {
+  clearData();
+  clearResumePhase();
+};
+export const getStoredResumePhaseId = () => getResumePhase();
+export const setStoredResumePhaseId = (phaseId) => setResumePhase(phaseId);
+export const clearStoredResumePhaseId = () => clearResumePhase();
 
 export const markPhaseVisited = (phaseId) => {
   const current = getData();
@@ -54,7 +60,9 @@ export const getPhaseQuestions = (phaseId) => phases[phaseId]?.questions || [];
 
 export const getPhaseCompletion = (phaseId) => {
   if (isPhaseComplete(phaseId)) return 100;
-  const questions = getPhaseQuestions(phaseId).filter((question) => question.type !== "info");
+  const questions = getPhaseQuestions(phaseId).filter(
+    (question) => question.type !== "info" && isQuestionRequired(question) && question.trackProgress !== false
+  );
   if (!questions.length) return 0;
   const answered = questions.filter((question) => isMeaningful(getAnswer(question.id))).length;
   return Math.round((answered / questions.length) * 100);
@@ -64,11 +72,19 @@ export const isPhaseComplete = (phaseId) => {
   const phase = phases[phaseId];
   if (!phase) return false;
 
+  if (phase.generated === "checkpoint") {
+    return isPhaseSeen(phaseId);
+  }
+
   if (phase.generated === "paths") {
     return isPhaseSeen(phaseId) || isMeaningful(getAnswer("selected_path"));
   }
 
   if (phase.generated && getPhaseQuestions(phaseId).length === 0) {
+    return isPhaseSeen(phaseId);
+  }
+
+  if (phase.generated === "profile") {
     return isPhaseSeen(phaseId);
   }
 
@@ -83,7 +99,11 @@ export const getCompletedPhaseCount = () =>
   }, 0);
 
 export const isJourneyComplete = () => {
-  const allQuestions = phaseOrder.flatMap((phaseId) => getPhaseQuestions(phaseId).filter((question) => question.type !== "info"));
+  const allQuestions = phaseOrder.flatMap((phaseId) =>
+    getPhaseQuestions(phaseId).filter(
+      (question) => question.type !== "info" && isQuestionRequired(question) && question.trackProgress !== false
+    )
+  );
   const totalQuestions = allQuestions.length;
   if (!totalQuestions) return false;
   const answeredQuestions = allQuestions.filter((question) => isMeaningful(getAnswer(question.id))).length;
@@ -109,7 +129,11 @@ export const getPhaseLabel = (phaseId) => phases[phaseId]?.title || phaseId;
 export const phaseProgress = (currentPhaseId = "") => {
   const total = phaseOrder.length;
   const completed = getCompletedPhaseCount();
-  const allQuestions = phaseOrder.flatMap((phaseId) => getPhaseQuestions(phaseId).filter((question) => question.type !== "info"));
+  const allQuestions = phaseOrder.flatMap((phaseId) =>
+    getPhaseQuestions(phaseId).filter(
+      (question) => question.type !== "info" && isQuestionRequired(question) && question.trackProgress !== false
+    )
+  );
   const totalQuestions = allQuestions.length;
   const answeredQuestions = allQuestions.filter((question) => isMeaningful(getAnswer(question.id))).length;
   return {
@@ -118,4 +142,10 @@ export const phaseProgress = (currentPhaseId = "") => {
     percent: Math.round((completed / total) * 100),
     questionPercent: Math.round((answeredQuestions / Math.max(totalQuestions, 1)) * 100),
   };
+};
+
+export const getResumePhaseId = () => {
+  const stored = getStoredResumePhaseId();
+  if (stored && phases[stored] && isPhaseUnlocked(stored) && !isPhaseComplete(stored)) return stored;
+  return phaseOrder.find((phaseId) => !isPhaseComplete(phaseId)) || phaseOrder[0];
 };

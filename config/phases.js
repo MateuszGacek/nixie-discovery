@@ -3,10 +3,14 @@ const o = (id, label, tags = {}) => ({ id, label, tags });
 export const phaseOrder = [
   "onboarding",
   "identity",
+  "identity_checkpoint",
   "joy_flow",
+  "joy_flow_checkpoint",
   "talents",
   "emotions",
+  "emotions_checkpoint",
   "work_style",
+  "work_style_checkpoint",
   "business",
   "profile_synthesis",
   "suggested_paths",
@@ -22,7 +26,7 @@ export const phases = {
     eyebrow: "Etap 0",
     title: "Onboarding",
     subtitle:
-      "To nie jest test ani diagnoza. To spokojny proces porzadkowania odpowiedzi. Na koncu dostaniesz material, ktory mozesz wkleic do LLM, zeby dostac poglebiona analize swojej sciezki.",
+      "To nie jest test ani diagnoza. To spokojny proces wracania do siebie, porzadkowania sygnalow i szukania kierunku, ktory mozesz potem lagodnie sprawdzic w praktyce.",
     questions: [
       {
         id: "onboarding_info",
@@ -30,6 +34,13 @@ export const phases = {
         title: "Zanim zaczniemy",
         description:
           "Nie szukamy jednej idealnej odpowiedzi. Szukamy powtarzajacych sie wzorcow: co Cie przyciaga, co daje Ci energie, co Cie porusza i jaki styl dzialania jest z Toba zgodny.",
+      },
+      {
+        id: "onboarding_support",
+        type: "info",
+        title: "To normalne, jesli nie masz jasnosci",
+        description:
+          "Mozesz odpowiadac fragmentami, chaotycznie albo niepewnie. Brak gotowej odpowiedzi tez jest informacja. Ten proces nie zastepuje terapii ani profesjonalnego wsparcia psychologicznego - mozesz zatrzymac sie, pominac pytanie albo wrocic pozniej.",
       },
       {
         id: "onboarding_needs",
@@ -74,8 +85,15 @@ export const phases = {
     eyebrow: "Etap 1",
     title: "Naturalna tozsamosc",
     subtitle:
-      "Ten etap pomaga zobaczyc, co pojawia sie naturalnie, zanim wlacza sie oczekiwania, rozsadek albo porownywanie sie z innymi.",
+      "Ten etap pomaga zobaczyc, co pojawia sie naturalnie, zanim wlacza sie oczekiwania, rozsadek albo porownywanie sie z innymi. Nie musisz niczego udowadniac - wystarczy, ze zbierzesz slady.",
     questions: [
+      {
+        id: "identity_support",
+        type: "info",
+        title: "To normalne, jesli czujesz opor",
+        description:
+          "Przy pytaniach o siebie czesto pojawia sie pustka, opor albo mysli typu nie wiem. Nie walcz z tym. Zapisz tyle, ile jest dzisiaj dostepne.",
+      },
       {
         id: "free_day",
         type: "textarea",
@@ -143,13 +161,34 @@ export const phases = {
       },
     ],
   },
+  identity_checkpoint: {
+    id: "identity_checkpoint",
+    order: 2,
+    eyebrow: "Checkpoint 1",
+    title: "Sygnal z tego etapu",
+    subtitle:
+      "Nie potrzebujesz jeszcze wnioskow na cale zycie. Zatrzymaj sie na chwile i zobacz, co po etapie o naturalnej tozsamosci zaczyna sie delikatnie wybijac.",
+    generated: "checkpoint",
+    checkpointFor: "identity",
+    questions: [
+      {
+        id: "identity_checkpoint_note",
+        type: "textarea",
+        title: "Jedna mysl na dzis",
+        description: "Zapisz jedna mysl, ktora chcesz ze soba zabrac po tym etapie.",
+        placeholder: "Np. coraz wyrazniej widze..., zaskoczylo mnie..., chce dalej obserwowac...",
+        required: false,
+        trackProgress: false,
+      },
+    ],
+  },
   joy_flow: {
     id: "joy_flow",
-    order: 2,
+    order: 3,
     eyebrow: "Etap 2",
     title: "Radosc, energia i flow",
     subtitle:
-      "Nie wszystko, co lubimy, powinno stac sie praca. Ale warto zobaczyc, ktore aktywnosci daja Ci energie, a ktore tylko brzmia atrakcyjnie z zewnatrz.",
+      "Nie wszystko, co lubimy, powinno stac sie praca. Na razie sprawdzamy tylko, co Cie ozywia, a co odcina Cie od siebie.",
     questions: [
       {
         id: "energizing_activities",
@@ -230,9 +269,30 @@ export const phases = {
       },
     ],
   },
+  joy_flow_checkpoint: {
+    id: "joy_flow_checkpoint",
+    order: 4,
+    eyebrow: "Checkpoint 2",
+    title: "Sygnal z tego etapu",
+    subtitle:
+      "Ten etap nie ma powiedziec Ci, co masz robic dalej. Ma tylko pokazac, po czym jest Ci bardziej zywo i bezpiecznie w sobie.",
+    generated: "checkpoint",
+    checkpointFor: "joy_flow",
+    questions: [
+      {
+        id: "joy_flow_checkpoint_note",
+        type: "textarea",
+        title: "Jedna mysl na dzis",
+        description: "Zapisz jedna rzecz, ktora chcesz zapamietac o swojej energii i radosci.",
+        placeholder: "Np. ozywia mnie..., odcina mnie od siebie..., chce sprawdzac wiecej...",
+        required: false,
+        trackProgress: false,
+      },
+    ],
+  },
   talents: {
     id: "talents",
-    order: 3,
+    order: 5,
     eyebrow: "Etap 3",
     title: "Talenty i naturalna latwosc",
     subtitle:
@@ -294,12 +354,19 @@ export const phases = {
   },
   emotions: {
     id: "emotions",
-    order: 4,
+    order: 6,
     eyebrow: "Etap 4",
     title: "Emocje jako kompas",
     subtitle:
-      "To, co nas frustruje albo porusza, czesto wskazuje na wartosci. Nie musi od razu oznaczac biznesu, ale moze pokazac obszar misji.",
+      "To, co nas frustruje albo porusza, czesto wskazuje na wartosci. Nie musi od razu oznaczac kierunku zawodowego - moze po prostu pokazywac, co jest dla Ciebie wazne.",
     questions: [
+      {
+        id: "emotions_support",
+        type: "info",
+        title: "To normalne, jesli to porusza",
+        description:
+          "Jesli przy tym etapie czujesz napiecie, smutek albo zlosc, nie znaczy to, ze robisz cos zle. Mozesz odpowiedziec krotko, zatrzymac sie albo wrocic do tych pytan pozniej.",
+      },
       {
         id: "world_frustration",
         type: "textarea",
@@ -359,13 +426,34 @@ export const phases = {
       },
     ],
   },
+  emotions_checkpoint: {
+    id: "emotions_checkpoint",
+    order: 7,
+    eyebrow: "Checkpoint 3",
+    title: "Sygnal z tego etapu",
+    subtitle:
+      "Po pytaniach o emocje nie potrzebujesz jeszcze rozwiazania. Wystarczy zobaczyc, co chce byc nazwane i czego nie trzeba juz dluzej ignorowac.",
+    generated: "checkpoint",
+    checkpointFor: "emotions",
+    questions: [
+      {
+        id: "emotions_checkpoint_note",
+        type: "textarea",
+        title: "Jedna mysl na dzis",
+        description: "Zapisz jedno zdanie, ktore chcesz zapamietac po tym etapie.",
+        placeholder: "Np. coraz wyrazniej widze, ze wazne jest dla mnie...",
+        required: false,
+        trackProgress: false,
+      },
+    ],
+  },
   work_style: {
     id: "work_style",
-    order: 5,
+    order: 8,
     eyebrow: "Etap 5",
     title: "Styl zycia i pracy",
     subtitle:
-      "Dobry kierunek to nie tylko temat. To tez forma pracy, tempo, ilosc ludzi, widocznosc i poziom ryzyka.",
+      "Dobry kierunek to nie tylko temat. To tez forma pracy, tempo, ilosc ludzi, widocznosc i poziom ryzyka. Szukamy stylu, w ktorym mozesz oddychac, a nie tylko dzialac.",
     questions: [
       {
         id: "ideal_workday",
@@ -399,6 +487,7 @@ export const phases = {
           o("want_resist", "Chce byc widoczna, ale mam opor", { visibility: 1 }),
           o("behind", "Wole dzialac za kulisami", { visibility: -2, independent: 1 }),
           o("depends", "Zalezy od tematu i formy", { strategic: 1 }),
+          o("not_ready", "Jeszcze nie wiem albo nie chce tego teraz rozstrzygac", { explorer: 1 }),
         ],
       },
       {
@@ -433,18 +522,46 @@ export const phases = {
       },
     ],
   },
+  work_style_checkpoint: {
+    id: "work_style_checkpoint",
+    order: 9,
+    eyebrow: "Checkpoint 4",
+    title: "Sygnal z tego etapu",
+    subtitle:
+      "Ten etap pomaga oddzielic cudze wyobrazenia od tego, co naprawde sluzy Twojemu zyciu. Zobacz, jaki styl zaczyna wygladac na bardziej Twoj.",
+    generated: "checkpoint",
+    checkpointFor: "work_style",
+    questions: [
+      {
+        id: "work_style_checkpoint_note",
+        type: "textarea",
+        title: "Jedna mysl na dzis",
+        description: "Zapisz jedna rzecz, ktora chcesz chronic w swoim przyszlym sposobie dzialania.",
+        placeholder: "Np. potrzebuje wiecej spokoju..., nie chce juz wracac do..., dobrze mi sluzy...",
+        required: false,
+        trackProgress: false,
+      },
+    ],
+  },
   business: {
     id: "business",
-    order: 6,
+    order: 10,
     eyebrow: "Etap 6",
-    title: "Biznes, pieniadze i gotowosc",
+    title: "Forma dzialania, pieniadze i gotowosc",
     subtitle:
-      "Nie wszystko musi stac sie biznesem. Ten etap pomaga sprawdzic, czy chcesz monetyzowac swoje zainteresowania, a jesli tak - w jakiej formie i tempie.",
+      "Nie wszystko musi stac sie biznesem. Ten etap pomaga sprawdzic, czy chcesz cos testowac zawodowo, projektowo albo prywatnie - i w jakiej formie byloby to dla Ciebie najbezpieczniejsze.",
     questions: [
+      {
+        id: "business_support",
+        type: "info",
+        title: "To normalne, jesli nie chcesz tego jeszcze nazywac biznesem",
+        description:
+          "Mozesz myslec o tym jako o projekcie pobocznym, spokojnej pracy, malej usludze, tworczosci prywatnej albo czyms, co dopiero sprawdzasz. Nie potrzebujesz teraz jednej etykiety.",
+      },
       {
         id: "business_feeling",
         type: "single",
-        title: "Kiedy myslisz o zbudowaniu czegos swojego, co czujesz najbardziej?",
+        title: "Kiedy myslisz o zrobieniu czegos bardziej po swojemu, co czujesz najbardziej?",
         options: [
           o("excitement", "Ekscytacje", { businessReadiness: 2, explorer: 1 }),
           o("curiosity", "Ciekawosc", { businessReadiness: 1, explorer: 1 }),
@@ -452,12 +569,13 @@ export const phases = {
           o("pressure", "Presje"),
           o("resistance", "Opor"),
           o("mix", "Mieszanke wszystkiego", { explorer: 1 }),
+          o("not_now", "Jeszcze nie chce tego rozstrzygac", { stability: 1 }),
         ],
       },
       {
         id: "why_business",
         type: "multi",
-        title: "Dlaczego myslisz o biznesie lub czyms swoim?",
+        title: "Dlaczego w ogole myslisz o czyms bardziej swoim?",
         options: [
           o("freedom", "Chce wiecej wolnosci", { freedom: 2, businessReadiness: 1 }),
           o("money", "Chce wiecej pieniedzy", { businessReadiness: 1 }),
@@ -468,6 +586,21 @@ export const phases = {
           o("potential", "Chce sprawdzic swoj potencjal", { explorer: 2 }),
           o("bigger", "Chce zbudowac cos wiekszego", { leadership: 1, builder: 1 }),
           o("pull", "Nie wiem, po prostu mnie to ciagnie", { explorer: 1 }),
+          o("soft_test", "Chce tylko lagodnie cos sprawdzic, bez presji", { stability: 1, explorer: 1 }),
+        ],
+      },
+      {
+        id: "preferred_next_form",
+        type: "multi",
+        title: "Jaka forma na ten moment brzmi najbezpieczniej do sprawdzenia?",
+        options: [
+          o("side_project", "Projekt poboczny po godzinach", { builder: 1, stability: 1 }),
+          o("calm_job", "Spokojna praca bardziej zgodna ze mna", { stability: 2, meaning: 1 }),
+          o("small_service", "Mala usluga albo rozmowy 1:1", { caring: 1, communication: 1, businessReadiness: 1 }),
+          o("digital_product", "Maly produkt cyfrowy", { builder: 1, creative: 1, businessReadiness: 1 }),
+          o("private_creativity", "Tworczosc prywatna bez monetyzacji na teraz", { creative: 1, meaning: 1, stability: 1 }),
+          o("behind_scenes", "Rola za kulisami albo wsparcie innych", { strategic: 1, organizational: 1, independent: 1 }),
+          o("not_sure_yet", "Nie wiem jeszcze i to jest w porzadku", { explorer: 1 }),
         ],
       },
       {
@@ -510,11 +643,11 @@ export const phases = {
   },
   profile_synthesis: {
     id: "profile_synthesis",
-    order: 7,
+    order: 11,
     eyebrow: "Etap 7",
     title: "Synteza profilu",
     subtitle:
-      "Na podstawie Twoich odpowiedzi aplikacja nie wyciaga ostatecznego wyniku, ale porzadkuje wzorce. Ten profil bedzie czescia finalnego promptu do LLM.",
+      "Na podstawie Twoich odpowiedzi aplikacja nie wyciaga ostatecznego wyniku, ale porzadkuje wzorce. To ma Ci pomoc zobaczyc siebie wyrazniej, a nie zamknac Cie w jednej definicji.",
     generated: "profile",
     questions: [
       {
@@ -522,26 +655,28 @@ export const phases = {
         type: "textarea",
         title: "Czy cos w tym profilu chcesz doprecyzowac?",
         description: "Mozesz dopisac, co wydaje sie trafne, nietrafne albo wazne.",
+        required: false,
+        trackProgress: false,
       },
     ],
   },
   suggested_paths: {
     id: "suggested_paths",
-    order: 8,
+    order: 12,
     eyebrow: "Etap 8",
     title: "Potencjalne sciezki",
     subtitle:
-      "Te sciezki sa hipotezami na podstawie Twoich odpowiedzi. Najwazniejszy bedzie maly test w praktyce.",
+      "Te sciezki sa hipotezami na podstawie Twoich odpowiedzi. Jedna sciezka nie wyklucza drugiej - chodzi o znalezienie kierunku, ktory warto teraz lagodnie sprawdzic.",
     generated: "paths",
     questions: [],
   },
   seven_day_experiment: {
     id: "seven_day_experiment",
-    order: 9,
+    order: 13,
     eyebrow: "Etap 9",
     title: "Eksperyment 7-dniowy",
     subtitle:
-      "Nie musisz zmieniac zycia w 7 dni. Masz tylko zebrac dane: energia, sens, opor, ciekawosc i realny odzew.",
+      "Nie musisz zmieniac zycia w 7 dni. Masz tylko zebrac sygnaly z rzeczywistosci: energia, opor, ciekawosc, sens i realny odzew.",
     generated: "experiment",
     questions: [
       {
@@ -555,22 +690,28 @@ export const phases = {
         id: "experiment_feeling",
         type: "textarea",
         title: "Co czuje po przeczytaniu tego eksperymentu?",
+        required: false,
+        trackProgress: false,
       },
       {
         id: "easiest_first_step",
         type: "textarea",
         title: "Co jest dla mnie najlatwiejszym pierwszym krokiem?",
+        required: false,
+        trackProgress: false,
       },
       {
         id: "experiment_blocker",
         type: "textarea",
         title: "Co mnie blokuje?",
+        required: false,
+        trackProgress: false,
       },
     ],
   },
   decision_system: {
     id: "decision_system",
-    order: 10,
+    order: 14,
     eyebrow: "Etap 10",
     title: "System decyzyjny",
     subtitle: "Ten etap tworzy osobisty filtr wyboru: po czym poznasz, ze cos naprawde do Ciebie pasuje.",
@@ -631,11 +772,11 @@ export const phases = {
   },
   final_report: {
     id: "final_report",
-    order: 11,
+    order: 15,
     eyebrow: "Etap 11",
     title: "Finalny raport i prompt do LLM",
     subtitle:
-      "To nie jest ostateczna diagnoza. To uporzadkowany material do dalszej analizy i gotowy prompt, ktory mozesz skopiowac do LLM.",
+      "To nie jest ostateczna diagnoza. To lekkie podsumowanie tego, co juz o sobie widzisz, oraz osobna przestrzen do poglebienia tego w LLM, jesli zechcesz.",
     generated: "final",
     questions: [],
   },

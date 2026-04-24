@@ -1,6 +1,6 @@
-import { getAnswers, resetState, phaseProgress, isJourneyComplete } from "./state.js";
+import { getAnswers, resetState, phaseProgress, isJourneyComplete, getResumePhaseId } from "./state.js";
 import { phases, phaseOrder } from "../../config/phases.js";
-import { buildProfile, downloadText, generateHumanReport, generateLLMPrompt } from "./report.js";
+import { buildProfile, downloadText, generateFinalReportHtml, generateHumanReport, generateLLMTabHtml, generateLLMPrompt } from "./report.js";
 import { formatAnswer } from "./scoring.js";
 
 const getPhaseUrl = (phaseId) => new URL(`../../phases/${phaseId}.html`, import.meta.url).href;
@@ -34,13 +34,60 @@ const getAnsweredEntries = (answers) =>
   );
 
 const findNextPhaseId = (answers) =>
+  getResumePhaseId() ||
   phaseOrder.find((phaseId) => {
     const phase = phases[phaseId];
     return (phase.questions || []).some((question) => {
       if (question.type === "info") return false;
       return !formatAnswer(question, answers[question.id]);
     });
-  }) || phaseOrder[0];
+  }) ||
+  phaseOrder[0];
+
+const bindFinalTabs = (root, profile) => {
+  const report = generateHumanReport(profile);
+  const prompt = generateLLMPrompt(profile);
+
+  root.querySelectorAll("[data-final-tab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const tab = button.dataset.finalTab;
+      root.querySelectorAll("[data-final-tab]").forEach((item) => {
+        item.dataset.active = item.dataset.finalTab === tab ? "true" : "false";
+      });
+      root.querySelectorAll("[data-final-panel]").forEach((panel) => {
+        panel.hidden = panel.dataset.finalPanel !== tab;
+      });
+    });
+  });
+
+  root.querySelectorAll('[data-action="copy-prompt"]').forEach((button) => {
+    button.addEventListener("click", async (event) => {
+      const currentButton = event.currentTarget;
+      const original = currentButton.textContent;
+      try {
+        await copyToClipboard(prompt);
+        currentButton.textContent = "Skopiowano";
+      } catch {
+        currentButton.textContent = "Nie udalo sie skopiowac";
+      }
+      window.setTimeout(() => {
+        currentButton.textContent = original;
+      }, 1200);
+    });
+  });
+
+  root.querySelectorAll('[data-action="download-txt"]').forEach((button) => {
+    button.addEventListener("click", () => {
+      downloadText("moja-sciezka-raport.txt", report);
+    });
+  });
+
+  root.querySelectorAll('[data-action="download-json"]').forEach((button) => {
+    button.addEventListener("click", () => {
+      downloadText("moja-sciezka-dane.json", JSON.stringify(profile, null, 2), "application/json");
+    });
+  });
+};
 
 export const renderSummary = (containerId = "phase-root") => {
   const container = document.getElementById(containerId);
@@ -48,13 +95,12 @@ export const renderSummary = (containerId = "phase-root") => {
 
   const answers = getAnswers();
   const profile = buildProfile(answers);
-  const report = generateHumanReport(profile);
-  const prompt = generateLLMPrompt(profile);
   const progress = phaseProgress("summary");
   const answeredEntries = getAnsweredEntries(answers);
   const isEmpty = answeredEntries.length === 0;
   const isComplete = isJourneyComplete();
   const nextPhaseId = findNextPhaseId(answers);
+  const heroTargetId = isComplete ? "final_report" : nextPhaseId;
   const recentAnswers = answeredEntries.slice(-4).reverse();
 
   const shell = document.createElement("section");
@@ -70,7 +116,7 @@ export const renderSummary = (containerId = "phase-root") => {
           <span>${progress.completed} z ${progress.total} etapow gotowe</span>
         </div>
       </div>
-      <p class="summary-subtitle">Zamiast jednego dumpu tresci dostajesz centrum sterowania: progres, ostatnie odpowiedzi i raport gotowy dopiero wtedy, gdy ma sens.</p>
+      <p class="summary-subtitle">To miejsce pozwala Ci spokojnie wrocic do procesu, zobaczyc, co juz sie wybijalo, i dopiero potem wejsc w poglebienie.</p>
     </header>
   `;
 
@@ -83,11 +129,11 @@ export const renderSummary = (containerId = "phase-root") => {
       <p>${isEmpty
         ? "Aplikacja najlepiej dziala jako spokojny proces krok po kroku. Zacznij od onboardingu, a podsumowanie zbuduje sie samo."
         : isComplete
-          ? "Przejdz przez raport, skopiuj prompt do LLM albo pobierz dane. Wszystko zostaje lokalnie w przegladarce."
-          : "Najpierw domknij kolejne etapy, potem raport i prompt beda naprawde wartosciowe."}</p>
+          ? "Masz juz wartosc z samej aplikacji. Prompt do LLM jest dodatkiem, nie koniecznoscia."
+          : "Najpierw domknij kolejne etapy i checkpointy, a finalny raport stanie sie czytelniejszy i lzejszy."}</p>
     </div>
     <div class="summary-hero-actions">
-      <a class="button button-primary" href="${getPhaseUrl(nextPhaseId)}">${isEmpty ? "Rozpocznij proces" : isComplete ? "Wroc do etapow" : "Kontynuuj proces"}</a>
+      <a class="button button-primary" href="${getPhaseUrl(heroTargetId)}">${isEmpty ? "Rozpocznij proces" : isComplete ? "Przejdz do finalu" : "Kontynuuj proces"}</a>
       <button class="button button-secondary" type="button" data-action="copy-prompt" ${isEmpty ? "disabled aria-disabled=\"true\"" : ""}>Kopiuj prompt</button>
       <button class="button button-secondary" type="button" data-action="download-json" ${isEmpty ? "disabled aria-disabled=\"true\"" : ""}>Pobierz .json</button>
       <button class="button button-danger" type="button" data-action="start-over">Wyczysc dane</button>
@@ -152,64 +198,38 @@ export const renderSummary = (containerId = "phase-root") => {
     `;
     grid.appendChild(nextCard);
   } else {
-    const reportCard = document.createElement("article");
-    reportCard.className = "summary-card final-card";
-    reportCard.innerHTML = `
+    const finalCard = document.createElement("article");
+    finalCard.className = "final-tabs-shell";
+    finalCard.innerHTML = `
       <div class="card-header">
         <div>
-          <p class="card-kicker">Raport</p>
-          <h2>Skondensowany obraz procesu</h2>
-        </div>
-        <button class="button button-secondary button-compact" type="button" data-action="download-txt">Pobierz .txt</button>
-      </div>
-      <details class="summary-detail" ${isComplete ? "open" : ""}>
-        <summary>Rozwin raport</summary>
-        <pre class="report-box">${report}</pre>
-      </details>
-    `;
-    grid.appendChild(reportCard);
-
-    const promptCard = document.createElement("article");
-    promptCard.className = "summary-card final-card";
-    promptCard.innerHTML = `
-      <div class="card-header">
-        <div>
-          <p class="card-kicker">Prompt</p>
-          <h2>Gotowy do dalszej analizy</h2>
+          <p class="card-kicker">Final</p>
+          <h2>Twoj wynik i poglebienie</h2>
         </div>
       </div>
-      <details class="summary-detail" ${isComplete ? "open" : ""}>
-        <summary>Rozwin prompt do LLM</summary>
-        <textarea class="field-control prompt-output" readonly>${prompt}</textarea>
-      </details>
+      <div class="final-tabs" role="tablist" aria-label="Widoki finalne">
+        <button type="button" class="final-tab-button" role="tab" data-final-tab="report" data-active="true">Twoj wynik z aplikacji</button>
+        <button type="button" class="final-tab-button" role="tab" data-final-tab="llm" data-active="false">Pogleb z LLM</button>
+      </div>
+      <div class="final-tab-panel" data-final-panel="report">
+        ${generateFinalReportHtml(profile)}
+      </div>
+      <div class="final-tab-panel" data-final-panel="llm" hidden>
+        ${generateLLMTabHtml(profile)}
+      </div>
+      <div class="summary-toolbar final-toolbar">
+        <button class="button button-primary" type="button" data-action="copy-prompt">Kopiuj prompt do LLM</button>
+        <button class="button button-secondary" type="button" data-action="download-txt">Pobierz raport .txt</button>
+        <button class="button button-secondary" type="button" data-action="download-json">Pobierz dane .json</button>
+      </div>
     `;
-    grid.appendChild(promptCard);
+    grid.appendChild(finalCard);
   }
 
   shell.appendChild(grid);
   container.replaceChildren(shell);
 
-  shell.querySelector('[data-action="copy-prompt"]')?.addEventListener("click", async (event) => {
-    const button = event.currentTarget;
-    const original = button.textContent;
-    try {
-      await copyToClipboard(prompt);
-      button.textContent = "Skopiowano";
-    } catch {
-      button.textContent = "Nie udalo sie skopiowac";
-    }
-    window.setTimeout(() => {
-      button.textContent = original;
-    }, 1200);
-  });
-
-  shell.querySelector('[data-action="download-txt"]')?.addEventListener("click", () => {
-    downloadText("moja-sciezka-raport.txt", report);
-  });
-
-  shell.querySelector('[data-action="download-json"]')?.addEventListener("click", () => {
-    downloadText("moja-sciezka-dane.json", JSON.stringify(profile, null, 2), "application/json");
-  });
+  bindFinalTabs(shell, profile);
 
   shell.querySelector('[data-action="start-over"]')?.addEventListener("click", () => {
     if (!window.confirm("Czy na pewno chcesz wyczyscic odpowiedzi i zaczac od nowa?")) return;

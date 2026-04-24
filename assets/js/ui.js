@@ -1,9 +1,12 @@
-import { getAnswer, getAnswers, phaseProgress } from "./state.js";
+import { getAnswer, getAnswers, phaseProgress, setStoredResumePhaseId } from "./state.js";
 import {
   buildProfile,
   downloadText,
+  generateCheckpointHtml,
   generateExperimentHtml,
+  generateFinalReportHtml,
   generateHumanReport,
+  generateLLMTabHtml,
   generateLLMPrompt,
   generatePathsHtml,
   generateProfileHtml,
@@ -29,6 +32,7 @@ const copyIconSvg = `
 
 const getPhaseUrl = (phaseId) => new URL(`../../phases/${phaseId}.html`, import.meta.url).href;
 const getSummaryUrl = () => new URL("../../summary.html", import.meta.url).href;
+const getHomeUrl = () => new URL("../../index.html", import.meta.url).href;
 
 const getClipboardText = (question) => {
   const answer = getAnswer(question.id);
@@ -106,58 +110,79 @@ const isAnsweredInDom = (shell, question) => {
   return fields.some((field) => hasValue(field.value));
 };
 
-const renderGeneratedSection = (kind) => {
+const bindFinalTabActions = (section, profile) => {
+  const report = generateHumanReport(profile);
+  const prompt = generateLLMPrompt(profile);
+
+  section.querySelectorAll("[data-final-tab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const tab = button.dataset.finalTab;
+      section.querySelectorAll("[data-final-tab]").forEach((item) => {
+        item.dataset.active = item.dataset.finalTab === tab ? "true" : "false";
+      });
+      section.querySelectorAll("[data-final-panel]").forEach((panel) => {
+        panel.hidden = panel.dataset.finalPanel !== tab;
+      });
+    });
+  });
+
+  section.querySelector('[data-final-action="copy-prompt"]')?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    const original = button.textContent;
+    try {
+      await copyToClipboard(prompt);
+      button.textContent = "Skopiowano";
+    } catch {
+      button.textContent = "Nie udalo sie skopiowac";
+    }
+    window.setTimeout(() => {
+      button.textContent = original;
+    }, 1200);
+  });
+
+  section.querySelector('[data-final-action="download-txt"]')?.addEventListener("click", () => {
+    downloadText("moja-sciezka-raport.txt", report);
+  });
+
+  section.querySelector('[data-final-action="download-json"]')?.addEventListener("click", () => {
+    downloadText("moja-sciezka-dane.json", JSON.stringify(profile, null, 2), "application/json");
+  });
+};
+
+const renderGeneratedSection = (kind, phaseData) => {
   const profile = buildProfile(getAnswers());
   const section = document.createElement("div");
   section.className = "generated-section";
 
   if (kind === "profile") {
     section.innerHTML = generateProfileHtml(profile);
+  } else if (kind === "checkpoint") {
+    section.innerHTML = generateCheckpointHtml(profile, phaseData.checkpointFor);
   } else if (kind === "paths") {
     section.innerHTML = generatePathsHtml(profile);
   } else if (kind === "experiment") {
     section.innerHTML = generateExperimentHtml(profile);
   } else if (kind === "final") {
-    const report = generateHumanReport(profile);
-    const prompt = generateLLMPrompt(profile);
     section.innerHTML = `
-      <article class="summary-card final-card">
-        <h2>Raport dla Ciebie</h2>
-        <pre class="report-box">${escapeText(report)}</pre>
-      </article>
-      <article class="summary-card final-card">
-        <h2>Gotowy prompt do LLM</h2>
-        <p class="soft-warning">Twoje odpowiedzi zostaja lokalnie. Sama decydujesz, czy skopiowac prompt i wkleic go do LLM.</p>
-        <textarea class="field-control prompt-output" readonly>${escapeText(prompt)}</textarea>
-        <div class="summary-toolbar">
+      <div class="final-tabs-shell">
+        <div class="final-tabs" role="tablist" aria-label="Finalne widoki">
+          <button type="button" class="final-tab-button" role="tab" data-final-tab="report" data-active="true">Twoj wynik z aplikacji</button>
+          <button type="button" class="final-tab-button" role="tab" data-final-tab="llm" data-active="false">Pogleb z LLM</button>
+        </div>
+        <div class="final-tab-panel" data-final-panel="report">
+          ${generateFinalReportHtml(profile)}
+        </div>
+        <div class="final-tab-panel" data-final-panel="llm" hidden>
+          ${generateLLMTabHtml(profile)}
+        </div>
+        <div class="summary-toolbar final-toolbar">
           <button class="button button-primary" type="button" data-final-action="copy-prompt">Kopiuj prompt do LLM</button>
           <button class="button button-secondary" type="button" data-final-action="download-txt">Pobierz raport .txt</button>
           <button class="button button-secondary" type="button" data-final-action="download-json">Pobierz dane .json</button>
         </div>
-      </article>
+      </div>
     `;
-
-    section.querySelector('[data-final-action="copy-prompt"]')?.addEventListener("click", async (event) => {
-      const button = event.currentTarget;
-      try {
-        await copyToClipboard(prompt);
-        const original = button.textContent;
-        button.textContent = "Skopiowano";
-        window.setTimeout(() => {
-          button.textContent = original;
-        }, 1200);
-      } catch {
-        button.textContent = "Nie udalo sie skopiowac";
-      }
-    });
-
-    section.querySelector('[data-final-action="download-txt"]')?.addEventListener("click", () => {
-      downloadText("moja-sciezka-raport.txt", report);
-    });
-
-    section.querySelector('[data-final-action="download-json"]')?.addEventListener("click", () => {
-      downloadText("moja-sciezka-dane.json", JSON.stringify(profile, null, 2), "application/json");
-    });
+    bindFinalTabActions(section, profile);
   }
 
   return section;
@@ -237,7 +262,7 @@ export const renderQuestion = (question) => {
       ...question,
       options: profile.suggestedPaths.slice(0, 5).map((path) => ({
         id: path.id,
-        label: `${path.name} (${path.matchScore})`,
+        label: `${path.name} (${path.matchLabel})`,
       })),
     };
   }
@@ -427,7 +452,7 @@ export const renderPhase = (phaseData, containerId = "phase-root", phaseId = "")
   shell.appendChild(header);
 
   if (phaseData.generated) {
-    shell.appendChild(renderGeneratedSection(phaseData.generated));
+    shell.appendChild(renderGeneratedSection(phaseData.generated, phaseData));
   }
 
   const list = document.createElement("div");
@@ -454,14 +479,26 @@ export const renderPhase = (phaseData, containerId = "phase-root", phaseId = "")
   const nextId = phaseOrder[currentIndex + 1];
   const actions = document.createElement("nav");
   actions.className = "phase-actions";
-  actions.innerHTML = `
-    ${previousId ? `<a class="button button-secondary" href="${getPhaseUrl(previousId)}">Wstecz</a>` : `<a class="button button-secondary" href="${getSummaryUrl()}">Podsumowanie</a>`}
-    ${
-      nextId
-        ? `<a class="button button-primary" data-next-phase href="${getPhaseUrl(nextId)}">Dalej</a>`
-        : `<a class="button button-primary" data-next-phase href="${getSummaryUrl()}">Zobacz podsumowanie</a>`
-    }
-  `;
+  if (phaseData.generated === "checkpoint") {
+    actions.innerHTML = `
+      ${previousId ? `<a class="button button-secondary" href="${getPhaseUrl(previousId)}">Wstecz</a>` : `<a class="button button-secondary" href="${getSummaryUrl()}">Podsumowanie</a>`}
+      <button class="button button-secondary" type="button" data-save-for-today>Zapisuje na dzis</button>
+      ${
+        nextId
+          ? `<a class="button button-primary" data-next-phase href="${getPhaseUrl(nextId)}">Ide dalej</a>`
+          : `<a class="button button-primary" data-next-phase href="${getSummaryUrl()}">Zobacz podsumowanie</a>`
+      }
+    `;
+  } else {
+    actions.innerHTML = `
+      ${previousId ? `<a class="button button-secondary" href="${getPhaseUrl(previousId)}">Wstecz</a>` : `<a class="button button-secondary" href="${getSummaryUrl()}">Podsumowanie</a>`}
+      ${
+        nextId
+          ? `<a class="button button-primary" data-next-phase href="${getPhaseUrl(nextId)}">Dalej</a>`
+          : `<a class="button button-primary" data-next-phase href="${getSummaryUrl()}">Zobacz podsumowanie</a>`
+      }
+    `;
+  }
   actions.querySelector("[data-next-phase]")?.addEventListener("click", (event) => {
     const missing = (phaseData.questions || []).filter((question) => isQuestionRequired(question) && !isAnsweredInDom(shell, question));
     if (!missing.length) return;
@@ -470,6 +507,10 @@ export const renderPhase = (phaseData, containerId = "phase-root", phaseId = "")
     first?.scrollIntoView({ behavior: "smooth", block: "center" });
     first?.classList.add("is-required-missing");
     window.setTimeout(() => first?.classList.remove("is-required-missing"), 1200);
+  });
+  actions.querySelector("[data-save-for-today]")?.addEventListener("click", () => {
+    setStoredResumePhaseId(nextId || phaseId);
+    window.location.href = getHomeUrl();
   });
   shell.appendChild(actions);
 

@@ -1,3 +1,5 @@
+import { scoreLabels } from "./scoring.js";
+
 export const pathDefinitions = [
   {
     id: "personal_brand_education",
@@ -68,7 +70,7 @@ export const pathDefinitions = [
     name: "Hybryda: stabilna praca + projekt poboczny",
     description: "Spokojne testowanie pomyslu obok stabilnego zrodla bez presji, ze wszystko musi stac sie biznesem od razu.",
     weights: { stability: 1.2, businessReadiness: 0.5, creative: 0.5, freedom: 0.5 },
-    businessModels: ["projekt po godzinach", "pilotaż", "sprzedaz testowa", "portfolio eksperymentow"],
+    businessModels: ["projekt po godzinach", "pilotaz", "sprzedaz testowa", "portfolio eksperymentow"],
     risks: ["rozproszenie", "przeciazenie czasowe", "brak jasnego kryterium kontynuacji"],
   },
   {
@@ -81,94 +83,128 @@ export const pathDefinitions = [
   },
 ];
 
-export const generateSuggestedPaths = (scores) =>
-  pathDefinitions
+const preferredFormBoosts = {
+  side_project: ["stable_work_side_project"],
+  calm_job: ["stable_work_side_project", "behind_the_scenes"],
+  small_service: ["mentoring_consulting", "strategy_processes"],
+  digital_product: ["digital_product", "content_storytelling"],
+  private_creativity: ["private_creativity", "physical_aesthetic_product"],
+  behind_scenes: ["behind_the_scenes", "strategy_processes"],
+};
+
+const matchToneByIndex = (index) => {
+  if (index === 0) return "mocny sygnal";
+  if (index === 1 || index === 2) return "dobry kierunek do lagodnego sprawdzenia";
+  return "lagodna hipoteza do sprawdzenia";
+};
+
+const humanizeSignal = (key) => {
+  const label = scoreLabels[key] || key;
+  return `W Twoich odpowiedziach wraca energia: ${label}.`;
+};
+
+const collectPreferredBoost = (answers, pathId) => {
+  const forms = Array.isArray(answers?.preferred_next_form) ? answers.preferred_next_form : [];
+  return forms.some((form) => (preferredFormBoosts[form] || []).includes(pathId)) ? 1.2 : 0;
+};
+
+export const generateSuggestedPaths = (scores, answers = {}) => {
+  const ranked = pathDefinitions
     .map((path) => {
       const raw = Object.entries(path.weights).reduce((sum, [key, weight]) => sum + (scores[key] || 0) * weight, 0);
-      const matchScore = Math.max(0, Math.round(raw * 10) / 10);
+      const matchScore = Math.max(0, Math.round((raw + collectPreferredBoost(answers, path.id)) * 10) / 10);
       const strongest = Object.entries(path.weights)
         .filter(([key]) => (scores[key] || 0) > 0)
         .sort((a, b) => (scores[b[0]] || 0) * b[1] - (scores[a[0]] || 0) * a[1])
-        .slice(0, 4)
+        .slice(0, 3)
         .map(([key]) => key);
+
       return {
         ...path,
         matchScore,
         whyItFits: strongest.length
-          ? strongest.map((key) => `W Twoich odpowiedziach mocno pojawia sie obszar: ${key}.`)
-          : ["Ta sciezka jest hipoteza do sprawdzenia, ale scoring nie wskazal jeszcze mocnych danych."],
+          ? strongest.map((key) => humanizeSignal(key))
+          : ["Na ten moment to delikatna hipoteza. Warto sprawdzic tylko tyle, ile brzmi bezpiecznie i realnie."],
       };
     })
     .sort((a, b) => b.matchScore - a.matchScore);
 
+  return ranked.map((path, index) => ({
+    ...path,
+    matchLabel: matchToneByIndex(index),
+  }));
+};
+
+const reflectionLine = "Po zadaniu zapisz: energia, opor, ciekawosc, sens i reakcja swiata.";
+
 const defaultDays = [
-  "Wybierz jeden maly temat albo problem do przetestowania.",
-  "Zapisz, komu to mogloby pomoc i dlaczego.",
-  "Stworz najprostsza wersje: notatke, liste, szkic albo rozmowe.",
-  "Pokaz to jednej zaufanej osobie albo zachowaj jako wersje robocza.",
-  "Zbierz feedback albo dopisz, co czujesz po kontakcie z tym pomyslem.",
-  "Nazwij minimalna forme dalszego testu.",
-  "Ocen energie, sens, opor, ciekawosc i realnosc kontynuacji.",
+  "Wybierz jeden drobny temat albo problem, ktory naprawde Cie ciagnie.",
+  "Nazwij, komu moglaby pomoc sama prosta probka tego pomyslu.",
+  "Stworz najmniejsza wersje: notatke, szkic, liste, rozmowe albo mini material.",
+  "Pokaz to jednej bezpiecznej osobie albo zatrzymaj jako wersje robocza i zobacz, czy chcesz do tego wrocic.",
+  "Zapisz, co przyszlo latwo, a gdzie pojawil sie opor.",
+  "Nazwij najmniejszy kolejny krok, jesli w ogole chcesz go zrobic.",
+  "Sprawdz, czy to nadal brzmi jak cos Twojego, czy tylko jak ciekawy pomysl.",
 ];
 
 const experiments = {
   personal_brand_education: [
-    "Wybierz 3 tematy, o ktorych moglabys mowic bez przygotowania.",
-    "Napisz krotka notatke: Co chcialabym, zeby wiecej osob zrozumialo o tym temacie.",
-    "Pokaz tekst jednej zaufanej osobie albo zachowaj jako wersje robocza.",
-    "Stworz druga tresc w prostszej formie: 5 punktow, historia albo lekcja.",
-    "Porozmawiaj z 2 osobami, ktore moglyby byc odbiorcami tego tematu.",
-    "Wymysl mini oferte: PDF, konsultacja, warsztat albo seria tresci.",
-    "Ocen energie, sens, opor i chec kontynuacji.",
+    "Wybierz jeden temat, o ktorym naturalnie chcesz mowic albo pisac.",
+    "Napisz krotka notatke: co chcialabym, zeby jedna osoba zrozumiala po kontakcie z tym tematem.",
+    "Przerob to na mala probke: 5 punktow, mini post, notatke glosowa albo 1 strone PDF.",
+    "Pokaz to jednej zaufanej osobie i popros tylko o spokojna reakcje, nie o pelna ocene.",
+    "Zapisz, co bylo dla Ciebie zywe, a co brzmialo jak przymus.",
+    "Nazwij najlagodniejsza forme kontynuacji: kolejny tekst, rozmowa, mini material.",
+    "Sprawdz, czy chcesz do tego wrocic jutro bez zmuszania sie.",
   ],
   mentoring_consulting: [
-    "Wybierz jeden problem, w ktorym naturalnie pomagasz.",
-    "Stworz 5 pytan, ktore pomoglyby komus uporzadkowac ten problem.",
-    "Zapros jedna zaufana osobe na 30-minutowa rozmowe testowa.",
-    "Przeprowadz rozmowe bez dawania gotowych rad - sluchaj i porzadkuj.",
-    "Popros o feedback.",
-    "Zapisz strukture rozmowy.",
-    "Ocen, czy mialas energie po rozmowie i czy chcesz to powtorzyc.",
+    "Wybierz jeden problem, przy ktorym naturalnie sluchasz i pomagasz porzadkowac.",
+    "Zapisz 5 pytan, ktore pomoglyby komus zrobic maly krok, bez dawania gotowych rozwiazan.",
+    "Zapros jedna bezpieczna osobe na krotka rozmowe testowa albo przejdz przez te pytania sama na kartce.",
+    "Po rozmowie zapisz, czy czulas wiecej energii czy wiecej ciezaru.",
+    "Popros tylko o krotka odpowiedz: co w tej rozmowie bylo pomocne.",
+    "Nazwij, jaka forma bylaby dla Ciebie lzejsza: jedna rozmowa, seria pytan, mini sesja.",
+    "Zobacz, czy chcesz ten typ kontaktu powtorzyc.",
   ],
   digital_product: [
-    "Wybierz problem, ktory chcesz pomoc rozwiazac.",
-    "Wypisz 10 pytan lub obaw osoby, ktora ma ten problem.",
-    "Zaprojektuj mini produkt: PDF, checkliste, workbook albo mini kurs.",
-    "Stworz szkic pierwszej strony lub modulu.",
-    "Pokaz 2 osobom i zapytaj, czy to byloby pomocne.",
-    "Popraw koncept.",
-    "Ocen energie i realnosc dalszej pracy.",
+    "Wybierz jeden maly problem, ktory chcesz uporzadkowac dla kogos innego.",
+    "Wypisz 5 pytan albo obaw osoby, ktora ma ten problem.",
+    "Stworz mini probke produktu: jedna strone workbooka, checkliste albo szkic PDF.",
+    "Pokaz probke jednej bezpiecznej osobie i zapytaj, czy to jest czytelne i pomocne.",
+    "Zapisz, czy tworzenie tej rzeczy bylo dla Ciebie zywe czy ciezkie.",
+    "Nazwij najmniejsza wersje, ktora ma sens jako kolejny test.",
+    "Sprawdz, czy chcesz ja rozwinac, czy zostawic tylko jako sygnal.",
   ],
   physical_aesthetic_product: [
-    "Stworz moodboard 10 inspiracji.",
-    "Wybierz jeden mikroprodukt lub koncept.",
-    "Stworz prosty prototyp albo wizualizacje.",
-    "Pokaz 3 osobom.",
-    "Policz orientacyjny koszt.",
-    "Stworz karte produktu: nazwa, opis, cena testowa.",
-    "Ocen, czy chcesz zrobic drugi prototyp.",
+    "Zbierz 6-10 inspiracji, ktore pokazuja klimat rzeczy, jakie chcesz tworzyc.",
+    "Wybierz jeden bardzo maly koncept albo mikroprodukt.",
+    "Stworz szkic, wizualizacje albo prosty prototyp, bez presji idealnego wykonania.",
+    "Pokaz go jednej bezpiecznej osobie i zapytaj, co czuje, kiedy na to patrzy.",
+    "Zapisz, czy ten proces bardziej Cie regeneruje czy obciaza.",
+    "Nazwij, jaka bylaby najmniejsza nastepna wersja tej rzeczy.",
+    "Sprawdz, czy chcesz zrobic druga probe.",
   ],
   behind_the_scenes: [
-    "Wybierz typ chaosu lub problemu, ktory umiesz porzadkowac.",
-    "Znajdz przyklad osoby lub projektu, ktoremu moglabys pomoc.",
-    "Stworz mini audyt lub liste usprawnien.",
-    "Pokaz komus propozycje.",
-    "Zapytaj, czy taka pomoc bylaby wartosciowa.",
-    "Opisz prosta usluge.",
-    "Ocen, czy ten tryb pracy Ci pasuje.",
+    "Wybierz typ chaosu, ktory naturalnie lubisz porzadkowac.",
+    "Znajdz jeden realny przyklad projektu, procesu albo sytuacji, ktora moglabys ulozyc lepiej.",
+    "Stworz mala mape usprawnien albo liste 5 prostych ruchow.",
+    "Pokaz jedna bezpieczna osobe ten sposob myslenia i sprawdz, czy brzmi wartosciowo.",
+    "Zapisz, czy bardziej czulas ulge z porzadkowania czy ciezar cudzych spraw.",
+    "Nazwij najlzejsza forme dalszego testu: audyt, konsultacja, lista usprawnien.",
+    "Sprawdz, czy taki tryb pracy nadal brzmi jak cos Twojego.",
   ],
 };
 
 export const generateSevenDayExperiment = (pathId) => {
   const path = pathDefinitions.find((entry) => entry.id === pathId) || pathDefinitions[0];
-  const tasks = experiments[path?.id] || defaultDays;
+  const tasks = experiments[path.id] || defaultDays;
   return {
-    title: `7-dniowy test: ${path.name}`,
-    goal: "Zebrac dane z praktyki, nie podjac decyzje na cale zycie.",
+    title: `7-dniowy lagodny test: ${path.name}`,
+    goal: "Zebrac pierwszy sygnal z praktyki, nie podjac decyzje na cale zycie.",
     days: tasks.map((task, index) => ({
       day: index + 1,
       task,
-      reflection: "Po zadaniu zapisz: energia, sens, opor, ciekawosc, realny odzew.",
+      reflection: reflectionLine,
     })),
   };
 };
