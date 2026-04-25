@@ -58,6 +58,9 @@ const list = (items) =>
     ? `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
     : "<p>Brak danych.</p>";
 
+const htmlList = (items) =>
+  items.length ? `<ul>${items.join("")}</ul>` : "<p>Brak danych.</p>";
+
 const answerHighlights = (profile, ids) =>
   ids
     .map((id) => {
@@ -270,23 +273,23 @@ export const generateProfileHtml = (profile) => {
     </article>
     <article class="summary-card generated-card">
       <h2>Co Cie ozywia</h2>
-      ${list(answerHighlights(profile, ["energizing_activities", "last_flow_moment", "safe_sharing_forms"]))}
+      ${htmlList(answerHighlights(profile, ["energizing_activities", "last_flow_moment", "safe_sharing_forms"]))}
     </article>
     <article class="summary-card generated-card">
       <h2>Talenty i naturalna latwosc</h2>
-      ${list(answerHighlights(profile, ["natural_easy_things", "others_praise", "talent_statements", "talent_energy_notes"]))}
+      ${htmlList(answerHighlights(profile, ["natural_easy_things", "others_praise", "talent_statements", "talent_energy_notes"]))}
     </article>
     <article class="summary-card generated-card">
       <h2>Wartosci, ktore wracaja</h2>
-      ${list(answerHighlights(profile, ["world_frustration", "what_should_change", "problems_to_solve", "core_values"]))}
+      ${htmlList(answerHighlights(profile, ["world_frustration", "what_should_change", "problems_to_solve", "core_values"]))}
     </article>
     <article class="summary-card generated-card">
       <h2>Jaki styl sluzy Ci bardziej</h2>
-      ${list(answerHighlights(profile, ["ideal_workday", "freedom_vs_stability", "solo_vs_people", "visibility_comfort", "preferred_pace"]))}
+      ${htmlList(answerHighlights(profile, ["ideal_workday", "freedom_vs_stability", "solo_vs_people", "visibility_comfort", "preferred_pace"]))}
     </article>
     <article class="summary-card generated-card">
       <h2>Czego chcesz chronic mniej</h2>
-      ${list(answerHighlights(profile, ["draining_activities", "hard_no_list", "business_blockers"]))}
+      ${htmlList(answerHighlights(profile, ["draining_activities", "hard_no_list", "business_blockers"]))}
     </article>
   `;
 };

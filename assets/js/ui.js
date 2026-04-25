@@ -118,10 +118,15 @@ const bindFinalTabActions = (section, profile) => {
     button.addEventListener("click", () => {
       const tab = button.dataset.finalTab;
       section.querySelectorAll("[data-final-tab]").forEach((item) => {
-        item.dataset.active = item.dataset.finalTab === tab ? "true" : "false";
+        const isActive = item.dataset.finalTab === tab;
+        item.dataset.active = isActive ? "true" : "false";
+        item.setAttribute("aria-selected", isActive ? "true" : "false");
       });
       section.querySelectorAll("[data-final-panel]").forEach((panel) => {
-        panel.hidden = panel.dataset.finalPanel !== tab;
+        const isVisible = panel.dataset.finalPanel === tab;
+        panel.hidden = !isVisible;
+        panel.dataset.visible = isVisible ? "true" : "false";
+        panel.setAttribute("aria-hidden", isVisible ? "false" : "true");
       });
     });
   });
@@ -165,14 +170,14 @@ const renderGeneratedSection = (kind, phaseData) => {
   } else if (kind === "final") {
     section.innerHTML = `
       <div class="final-tabs-shell">
-        <div class="final-tabs" role="tablist" aria-label="Finalne widoki">
-          <button type="button" class="final-tab-button" role="tab" data-final-tab="report" data-active="true">Twoj wynik z aplikacji</button>
-          <button type="button" class="final-tab-button" role="tab" data-final-tab="llm" data-active="false">Pogleb z LLM</button>
+      <div class="final-tabs" role="tablist" aria-label="Finalne widoki">
+          <button type="button" class="final-tab-button" role="tab" aria-selected="true" data-final-tab="report" data-active="true">Twoj wynik z aplikacji</button>
+          <button type="button" class="final-tab-button" role="tab" aria-selected="false" data-final-tab="llm" data-active="false">Pogleb z LLM</button>
         </div>
-        <div class="final-tab-panel" data-final-panel="report">
+        <div class="final-tab-panel" data-final-panel="report" data-visible="true" aria-hidden="false">
           ${generateFinalReportHtml(profile)}
         </div>
-        <div class="final-tab-panel" data-final-panel="llm" hidden>
+        <div class="final-tab-panel" data-final-panel="llm" data-visible="false" aria-hidden="true" hidden>
           ${generateLLMTabHtml(profile)}
         </div>
         <div class="summary-toolbar final-toolbar">

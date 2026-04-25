@@ -550,6 +550,11 @@ select.field-control {
   gap: 18px;
 }
 
+.final-tab-panel[hidden],
+.final-tab-panel[data-visible="false"] {
+  display: none !important;
+}
+
 .final-report-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
