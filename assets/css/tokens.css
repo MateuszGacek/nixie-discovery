@@ -7,6 +7,20 @@
   --color-burgundy: #7d5660;
   --color-espresso: #4f3940;
   --color-gold: #fef1c8;
+  --fit-warm-shell: #f5e8e1;
+  --fit-clay-soft: #e5d6cd;
+  --fit-porcelain: #f7f2ef;
+  --fit-clay: #dcc3b4;
+  --fit-blue-soft: #d2dae3;
+  --fit-mist: #e8ebee;
+  --fit-ink: #2f3438;
+  --fit-ink-soft: #65717a;
+  --fit-surface: rgba(247, 242, 239, 0.92);
+  --fit-surface-strong: rgba(232, 235, 238, 0.96);
+  --fit-border: rgba(47, 52, 56, 0.13);
+  --fit-shadow: 0 24px 54px rgba(47, 52, 56, 0.14);
+  --fit-gradient:
+    linear-gradient(135deg, rgba(247, 242, 239, 0.98) 0%, rgba(245, 232, 225, 0.9) 42%, rgba(210, 218, 227, 0.92) 100%);
 
   --rgb-accent: 217, 142, 173;
   --rgb-accent-soft: 254, 195, 225;
@@ -14,6 +28,9 @@
   --rgb-warm: 255, 231, 207;
   --rgb-ink: 79, 57, 64;
   --rgb-ink-strong: 125, 86, 96;
+  --rgb-fit-clay: 220, 195, 180;
+  --rgb-fit-blue-soft: 210, 218, 227;
+  --rgb-fit-ink: 47, 52, 56;
 
   --bg-main:
     radial-gradient(circle at top left, rgba(var(--rgb-accent-soft), 0.26), transparent 24%),

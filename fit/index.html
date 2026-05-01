@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Strefa Fit - plan FBW A/B, zasady progresu i praca pod pośladki oraz pierwszy pull-up."
+    />
+    <meta name="theme-color" content="#F7F2EF" />
+    <title>Strefa Fit | Nixie Discovery</title>
+    <link rel="icon" href="../assets/logo.svg" type="image/svg+xml" sizes="any" />
+    <link rel="stylesheet" href="../assets/css/reset.css" />
+    <link rel="stylesheet" href="../assets/css/tokens.css" />
+    <link rel="stylesheet" href="../assets/css/layout.css" />
+    <link rel="stylesheet" href="../assets/css/components.css" />
+    <link rel="stylesheet" href="../assets/css/fit.css" />
+  </head>
+  <body class="fit-page">
+    <main class="fit-shell">
+      <section class="fit-app" aria-labelledby="fit-title">
+        <header class="fit-header">
+          <a class="fit-back-link" href="../index.html" aria-label="Wróć na ekran główny">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
+          </a>
+          <div class="fit-brand">
+            <span class="fit-brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M6.5 9.25v5.5M17.5 9.25v5.5M4 11v2M20 11v2M8.75 12h6.5" />
+              </svg>
+            </span>
+            <span>Strefa Fit</span>
+          </div>
+        </header>
+
+        <section class="fit-hero" aria-labelledby="fit-title">
+          <p class="fit-kicker">Strefa treningu</p>
+          <h1 class="fit-title" id="fit-title">Ankle-safe block</h1>
+          <p class="fit-hero-copy">
+            Faza ochronna na 2-4 tygodnie: plecy idą mocno, pull-up path zostaje priorytetem, a pośladek pracuje na macie i z gumą bez docisku przez kontuzjowaną kostkę.
+          </p>
+        </section>
+
+        <nav class="fit-mobile-nav" aria-label="Sekcje Strefy Fit">
+          <a href="#overview">Założenia</a>
+          <a href="#plan">Plan</a>
+          <a href="#progression">Progres</a>
+          <a href="#safety">Bezpieczeństwo</a>
+          <a href="#return">Powrót</a>
+        </nav>
+
+        <section class="fit-section fit-overview" id="overview" aria-labelledby="fit-overview-title">
+          <div class="fit-panel fit-lead-panel">
+            <div class="fit-panel-heading">
+              <span class="fit-section-index">01</span>
+              <div>
+                <p class="fit-kicker">Cel bloku</p>
+                <h2 id="fit-overview-title">Pod co jest ten plan</h2>
+              </div>
+            </div>
+            <p>
+              To tymczasowy blok ochronny. Priorytet: nie pogłębić urazu, trenować górę normalnie, utrzymać rytm i robić pośladek przez ćwiczenia leżące, siedzące i bandy.
+            </p>
+          </div>
+
+          <div class="fit-priority-grid" aria-label="Priorytety planu">
+            <article class="fit-priority-card">
+              <span>01</span>
+              <strong>Kostka chroniona</strong>
+              <p>Zero hip thrustów, leg pressa, RDL, wykroków, bułgarów, step-upów i pracy stojąc na jednej nodze.</p>
+            </article>
+            <article class="fit-priority-card">
+              <span>02</span>
+              <strong>Góra idzie normalnie</strong>
+              <p>Plecy, klatka, tył barku i łopatki robią robotę. Lat pulldown zostaje główną bazą pod pull-up.</p>
+            </article>
+            <article class="fit-priority-card">
+              <span>03</span>
+              <strong>Dół bez docisku stopy</strong>
+              <p>Tył uda przez leg curl, a pośladek przez side-lying hip abduction, clamshell, seated band abduction i prone hip extension.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="fit-section" id="plan" aria-labelledby="fit-plan-title">
+          <div class="fit-section-header">
+              <span class="fit-section-index">02</span>
+              <div>
+                <p class="fit-kicker">FBW ochronne</p>
+                <h2 id="fit-plan-title">Plan treningowy</h2>
+              </div>
+            </div>
+
+          <div class="fit-week-card">
+            <div>
+              <strong>Tydzień 1</strong>
+              <span>Pon: A · Śr: B · Pt: A</span>
+            </div>
+            <div>
+              <strong>Tydzień 2</strong>
+              <span>Pon: B · Śr: A · Pt: B</span>
+            </div>
+          </div>
+
+          <div class="fit-workout-toolbar" role="tablist" aria-label="Wybór treningu">
+            <button class="fit-plan-tab" type="button" data-plan-tab="A" aria-selected="true">FBW A</button>
+            <button class="fit-plan-tab" type="button" data-plan-tab="B" aria-selected="false">FBW B</button>
+          </div>
+
+          <div class="fit-workout-note" id="fitWorkoutNote" aria-live="polite"></div>
+          <div class="fit-exercise-list" id="fitExerciseList"></div>
+        </section>
+
+        <section class="fit-section fit-two-column" id="progression" aria-labelledby="fit-progression-title">
+          <div class="fit-panel">
+            <div class="fit-panel-heading">
+              <span class="fit-section-index">03</span>
+              <div>
+                <p class="fit-kicker">Zasada</p>
+                <h2 id="fit-progression-title">Progresja w tym etapie</h2>
+              </div>
+            </div>
+            <div class="fit-rule-list">
+              <p><strong>Góra ciała:</strong> progresuj normalnie. Najpierw powtórzenia, potem mały wzrost ciężaru.</p>
+              <p><strong>Dół ciała:</strong> zero agresji. Najpierw brak bólu, kontrola i brak pogorszenia następnego dnia. Ciężar jako ostatni.</p>
+              <p><strong>Mata i guma:</strong> progresuj powtórzeniami, pauzą w spięciu, wolniejszym tempem, mocniejszą gumą albo dodatkową serią.</p>
+              <p><strong>Face pull / reverse pec deck:</strong> jeśli łokcie, szyja albo barki są zmęczone, trzymaj 2 serie zamiast 3.</p>
+              <p><strong>Ból 3/10+:</strong> żadnej progresji na dół. Tylko ćwiczenia siedzące/leżące albo zamiennik.</p>
+            </div>
+          </div>
+
+          <div class="fit-panel">
+            <div class="fit-panel-heading">
+              <span class="fit-section-index">04</span>
+              <div>
+                <p class="fit-kicker">Pull-up path</p>
+                <h2>Droga do drążka</h2>
+              </div>
+            </div>
+            <ol class="fit-step-list">
+              <li>Lat pulldown jako główna baza w etapie ochronnym.</li>
+              <li>Assisted pull-up tylko jeśli wejście, zejście i pozycja są 0/10 bólu.</li>
+              <li>Active hang i scapular pull-up tylko jeśli barki i kostka są bez problemu.</li>
+              <li>Wolne negatywy 3-5 sekund.</li>
+              <li>Pierwsze pełne powtórzenie.</li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="fit-section fit-two-column" id="safety" aria-labelledby="fit-safety-title">
+          <div class="fit-panel">
+            <div class="fit-panel-heading">
+              <span class="fit-section-index">05</span>
+              <div>
+                <p class="fit-kicker">Kostka i kolano</p>
+                <h2 id="fit-safety-title">Reguły bezpieczeństwa</h2>
+              </div>
+            </div>
+            <div class="fit-safety-list">
+              <p><strong>0-2/10</strong> Trening normalnie, ale dół nadal bez agresywnej progresji.</p>
+              <p><strong>3-4/10</strong> Nie progresuj nóg. Zmniejsz ciężar, zakres ruchu albo wybierz zamiennik.</p>
+              <p><strong>5+/10</strong> Przerwij ćwiczenie obciążające kostkę lub kolano.</p>
+              <p><strong>Następny dzień gorzej</strong> Cofnij objętość albo progresję.</p>
+              <p><strong>Wałek maszyny</strong> Jeśli leg curl uciska bolesny rejon kostki albo podudzia, zmień ustawienie albo maszynę.</p>
+            </div>
+          </div>
+
+          <div class="fit-panel">
+            <div class="fit-panel-heading">
+              <span class="fit-section-index">06</span>
+              <div>
+                <p class="fit-kicker">Na razie unikaj</p>
+                <h2>Czego nie dokładać</h2>
+              </div>
+            </div>
+            <ul class="fit-avoid-list">
+              <li>hip thrusty i glute bridge z mocnym dociskiem stóp</li>
+              <li>leg press</li>
+              <li>RDL i ciężkie hinge stojąc</li>
+              <li>wykroki chodzone</li>
+              <li>głębokie przysiady ze sztangą</li>
+              <li>bułgary i wysokie step-upy</li>
+              <li>cable kickback stojąc</li>
+              <li>Pallof press stojąc</li>
+              <li>skoki, bieganie i dynamiczne zmiany kierunku</li>
+              <li>ciężki martwy ciąg z podłogi</li>
+              <li>ciężkie wspięcia na palce</li>
+              <li>frog pumps, jeśli ustawienie stóp nie jest 0/10 bólu</li>
+              <li>adductor machine jako obowiązkowy element planu</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="fit-section" id="return" aria-labelledby="fit-return-title">
+          <div class="fit-section-header">
+            <span class="fit-section-index">07</span>
+            <div>
+              <p class="fit-kicker">Po 2-4 tygodniach</p>
+              <h2 id="fit-return-title">Powrót do mocniejszych ćwiczeń</h2>
+            </div>
+          </div>
+          <div class="fit-return-grid">
+            <article class="fit-priority-card">
+              <span>Warunek</span>
+              <strong>Najpierw zielone światło</strong>
+              <p>Fizjo pozwala, chód jest bez bólu, nie ma obrzęku, kostka jest stabilna i dzień po treningu nie ma pogorszenia.</p>
+            </article>
+            <article class="fit-priority-card">
+              <span>Kolejność</span>
+              <strong>Reintrodukcja</strong>
+              <p>Glute bridge / hip thrust lekko, potem płytki leg press, potem lekki RDL. Split squat, step-upy i wykroki dopiero na końcu.</p>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./fit-app.js" defer></script>
+  </body>
+</html>

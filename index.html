@@ -10,6 +10,8 @@
     <meta name="theme-color" content="#FFF9F6" />
     <title>Nixie Discovery</title>
     <link rel="icon" href="./assets/logo.svg" type="image/svg+xml" sizes="any" />
+    <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="stylesheet" href="./assets/css/reset.css" />
     <link rel="stylesheet" href="./assets/css/tokens.css" />
     <link rel="stylesheet" href="./assets/css/layout.css" />
@@ -51,8 +53,12 @@
             Na końcu dostaniesz uporządkowane podsumowanie swoich odpowiedzi.
           </p>
         </div>
+        <div class="landing-fit-zone" aria-label="Oddzielna część aplikacji">
+          <fit-zone-button href="./fit/index.html"></fit-zone-button>
+        </div>
       </section>
     </main>
+    <script type="module" src="./assets/js/fit-zone-button.js"></script>
     <script type="module">
       import { getResumePhaseId, resetState } from "./assets/js/state.js";
 
